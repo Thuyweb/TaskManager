@@ -36,18 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail = new PHPMailer(true);
 
             try {
-                // Cấu hình SMTP với Mailtrap
+                // Cấu hình SMTP với Gmail
                 $mail->isSMTP();
-                $mail->Host = 'sandbox.smtp.mailtrap.io'; // Máy chủ SMTP của Mailtrap
+                $mail->Host = 'smtp.gmail.com'; // Máy chủ SMTP của Gmail
                 $mail->SMTPAuth = true;
-                $mail->Username = '843ce3f8c2adb7'; // username của bạn từ Mailtrap
-                $mail->Password = '105be575c3b958'; // Thay bằng password của bạn từ Mailtrap
+                $mail->Username = 'phpkt2muc5@gmail.com'; // Thay bằng email Gmail của bạn
+                $mail->Password = 'dsng cdbe cktc ctux'; // Thay bằng mật khẩu ứng dụng Gmail
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Sử dụng mã hóa TLS
-                $mail->Port = 587; // Cổng SMTP của Mailtrap
+                $mail->Port = 587; // Cổng SMTP của Gmail
 
                 // Cấu hình email
                 $mail->CharSet = 'UTF-8'; // Thiết lập mã hóa UTF-8
-                $mail->setFrom('no-reply@taskmanager.local', 'Task Manager'); // Email gửi đi
+                $mail->setFrom('phpkt2muc5@gmail.com', 'Task Manager'); // Email gửi đi
                 $mail->addAddress($email); // Email người nhận
                 $mail->Subject = 'Task Management Notification'; // Tiêu đề email
                 $mail->Body = $emailBody;
@@ -74,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>

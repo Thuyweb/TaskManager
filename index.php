@@ -31,7 +31,7 @@ $result = $conn->query($sql);
         ">+ Thêm Công việc</a>
 
         <!-- Nút Thông báo với icon chuông -->
-        <a href="sendemail.php" style="
+        <a href="sendgmail.php" style="
             background-color:rgb(0, 255, 55);
             color: white;
             padding: 10px 15px;
