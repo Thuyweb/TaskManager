@@ -11,12 +11,40 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Công việc</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 
 </head>
 <body>
     <h1>Danh sách Công việc</h1>
     <!-- filepath: /Applications/XAMPP/xamppfiles/htdocs/php/index.php -->
+
+    <div style="text-align: center; margin-bottom: 10px;">
+    <!-- Nút Thêm Công việc -->
+        <a href="add_task.php" style="
+            background-color: rgb(0, 255, 55);
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        ">+ Thêm Công việc</a>
+
+        <!-- Nút Thông báo với icon chuông -->
+        <a href="notifications.php" style="
+            background-color:rgb(0, 255, 55);
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px; /* Khoảng cách giữa 2 nút */
+        ">
+            <i class="fas fa-bell"></i> Thông báo
+        </a>
+    </div>
+
+
     <table id="task-table">
         <thead>
             <tr>
@@ -24,6 +52,7 @@ $result = $conn->query($sql);
                 <th>Mô tả</th>
                 <th>Hạn chót</th>
                 <th>Ưu tiên</th>
+                <th>Hoàn thành</th>
                 <th>Hành động</th>
             </tr>
         </thead>
@@ -34,6 +63,9 @@ $result = $conn->query($sql);
                     <td><?= htmlspecialchars($row['description']) ?></td>
                     <td><?= htmlspecialchars($row['due_date']) ?></td>
                     <td><?= htmlspecialchars($row['priority']) ?></td>
+                    <td>
+                <input type="checkbox" class="task-completed" data-id="<?= $row['id'] ?>" <?= $row['completed'] ? 'checked' : '' ?>>
+            </td>
                     <td>
                         <a href="sua.php?id=<?= $row['id'] ?>">Sửa</a> | 
                         <a href="xoa.php?id=<?= $row['id'] ?>" onclick="return confirm('Bạn có chắc chắn muốn xóa công việc này không?')">Xóa</a>
@@ -83,43 +115,34 @@ $result = $conn->query($sql);
             }
         });
     </script>
-    <form action="" method="POST">
-        <label for="title">Tiêu đề:</label>
-        <input type="text" id="title" name="title" required>
-        <br>
-        <label for="description">Mô tả:</label>
-        <textarea id="description" name="description" required></textarea>
-        <br>
-        <label for="due_date">Hạn chót:</label>
-        <input type="date" id="due_date" name="due_date" required>
-        <br>
-        <label for="priority">Ưu tiên:</label>
-        <select id="priority" name="priority" required>
-            <option value="High">Cao</option>
-            <option value="Medium">Trung bình</option>
-            <option value="Low">Thấp</option>
-        </select>
-        <br>
-        <button type="submit" name="add_task">Thêm Công việc</button>
-    </form>
-    <?php
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_task'])) {
-        $title = $conn->real_escape_string($_POST['title']);
-        $description = $conn->real_escape_string($_POST['description']);
-        $due_date = $conn->real_escape_string($_POST['due_date']);
-        $priority = $conn->real_escape_string($_POST['priority']);
-    
-        $sql_insert = "INSERT INTO tasks (title, description, due_date, priority) 
-                       VALUES ('$title', '$description', '$due_date', '$priority')";
-    
-        if ($conn->query($sql_insert) === TRUE) {
-            echo "<p style='color: green;'>Công việc đã được thêm thành công!</p>";
-        } else {
-            echo "<p style='color: red;'>Lỗi: " . $conn->error . "</p>";
-        }
-    }
-    ?>
-    <script src="drag_and_drop.js"></script>
+
+    <script>
+document.querySelectorAll('.task-completed').forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+        const id = this.getAttribute('data-id');
+        const completed = this.checked ? 1 : 0;
+
+        fetch('check_box.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, completed })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Trạng thái hoàn thành đã được cập nhật!');
+            } else {
+                console.error('Lỗi khi cập nhật trạng thái:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+        });
+    });
+});
+        </script>
 </body>
 </html>
 <style>
