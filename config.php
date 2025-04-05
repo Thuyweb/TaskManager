@@ -1,14 +1,23 @@
 <?php
-$servername = "localhost";
-$username = "root"; // Username mặc định của MySQL
-$password = ""; // Password mặc định của MySQL nếu bạn chưa thay đổi
-$dbname = "TaskManagement"; // Tên database bạn đã tạo
+$host = 'localhost';
+$db   = 'TaskManagement';
+$user = 'root';
+$pass = '';
+$charset = 'utf8mb4';
 
-// Tạo kết nối
-$conn = new mysqli($servername, $username, $password, $dbname);
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (PDOException $e) {
+    die('Kết nối thất bại: ' . $e->getMessage());
 }
 ?>
+
+
