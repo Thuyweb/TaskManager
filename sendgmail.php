@@ -5,26 +5,20 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // Kết nối cơ sở dữ liệu
-require 'config.php'; // Tạo file config.php chứa thông tin kết nối cơ sở dữ liệu
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối cơ sở dữ liệu thất bại: " . $conn->connect_error);
-}
+require 'config.php'; // Kết nối cơ sở dữ liệu bằng PDO
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['notify']) && $_POST['notify'] === 'yes') {
         $email = $_POST['email'] ?? '';
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             // Lưu email vào cơ sở dữ liệu
-            $stmt = $conn->prepare("INSERT IGNORE INTO registered_emails (email) VALUES (?)");
-            $stmt->bind_param("s", $email);
+            $stmt = $pdo->prepare("INSERT IGNORE INTO registered_emails (email) VALUES (:email)");
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
             if ($stmt->execute()) {
                 echo "Email đã được lưu trữ thành công.\n";
             } else {
-                echo "Đã xảy ra lỗi khi lưu email: " . $stmt->error . "\n";
+                echo "Đã xảy ra lỗi khi lưu email.\n";
             }
-            $stmt->close();
 
             // Gửi email xác nhận
             $emailBody = "Xin chào,\n\nCảm ơn bạn đã đăng ký dịch vụ thông báo công việc sắp đến hạn chót từ Task Manager! 🎉\n\n"
@@ -71,8 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Bạn đã chọn không nhận thông báo.";
     }
 }
-
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="vi">

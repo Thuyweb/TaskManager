@@ -1,8 +1,10 @@
 <?php
 require 'config.php';
-$sql = "SELECT * FROM tasks ORDER BY due_date ASC";
+
+// Truy vấn dữ liệu từ bảng tasks
 $sql = "SELECT * FROM tasks ORDER BY position ASC";
-$result = $conn->query($sql);
+$stmt = $pdo->query($sql);
+$tasks = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -13,14 +15,12 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-
 </head>
 <body>
     <h1>Danh sách Công việc</h1>
-    <!-- filepath: /Applications/XAMPP/xamppfiles/htdocs/php/index.php -->
 
     <div style="text-align: center; margin-bottom: 10px;">
-    <!-- Nút Thêm Công việc -->
+        <!-- Nút Thêm Công việc -->
         <a href="add_task.php" style="
             background-color: rgb(0, 255, 55);
             color: white;
@@ -44,7 +44,6 @@ $result = $conn->query($sql);
         </a>
     </div>
 
-
     <table id="task-table">
         <thead>
             <tr>
@@ -57,21 +56,21 @@ $result = $conn->query($sql);
             </tr>
         </thead>
         <tbody id="task-list">
-            <?php while ($row = $result->fetch_assoc()): ?>
+            <?php foreach ($tasks as $row): ?>
                 <tr data-id="<?= $row['id'] ?>">
                     <td><?= htmlspecialchars($row['title']) ?></td>
                     <td><?= htmlspecialchars($row['description']) ?></td>
                     <td><?= htmlspecialchars($row['due_date']) ?></td>
                     <td><?= htmlspecialchars($row['priority']) ?></td>
                     <td>
-                <input type="checkbox" class="task-completed" data-id="<?= $row['id'] ?>" <?= $row['completed'] ? 'checked' : '' ?>>
-            </td>
+                        <input type="checkbox" class="task-completed" data-id="<?= $row['id'] ?>" <?= $row['completed'] ? 'checked' : '' ?>>
+                    </td>
                     <td>
                         <a href="sua.php?id=<?= $row['id'] ?>">Sửa</a> | 
                         <a href="xoa.php?id=<?= $row['id'] ?>" onclick="return confirm('Bạn có chắc chắn muốn xóa công việc này không?')">Xóa</a>
                     </td>
                 </tr>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </tbody>
     </table>
     <!-- java script để xử lý kéo và thả -->
