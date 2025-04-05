@@ -40,7 +40,7 @@ $result = $conn->query($sql);
             font-weight: bold;
             margin-left: 10px; /* Khoảng cách giữa 2 nút */
         ">
-            <i class="fas fa-bell"></i> Thông báo
+            <i class="fas fa-bell"></i> Bật thông báo
         </a>
     </div>
 
