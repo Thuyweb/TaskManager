@@ -1,7 +1,9 @@
 <?php
 require 'config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$messageText = ''; // Biến để lưu thông báo
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
     $title = $conn->real_escape_string($_POST['title']);
     $description = $conn->real_escape_string($_POST['description']);
     $due_date = $conn->real_escape_string($_POST['due_date']);
@@ -11,41 +13,169 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES ('$title', '$description', '$due_date', '$priority')";
 
     if ($conn->query($sql) === TRUE) {
-        header("Location: index.php");
-        exit;
+        $messageText = "Bạn đã thêm công việc thành công !"; // Gửi thông báo thành công
     } else {
-        echo "Lỗi: " . $conn->error;
+        $messageText = "Có lỗi xảy ra: " . $conn->error; // Gửi thông báo lỗi
     }
 }
 ?>
+<?php
+session_start();
+?>
+<!doctype html>
+<html lang="en">
 
-<!DOCTYPE html>
-<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Thêm Công việc</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gửi Email Nhắc Nhở</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <style>
+    /* CSS tùy chỉnh */
+    body {
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        /* Hiệu ứng nền gradient */
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        /* Hiệu ứng bóng */
+        overflow: hidden;
+        animation: fadeIn 1s ease-in-out;
+        /* Hiệu ứng mượt */
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        /* Gradient cho header */
+        color: white;
+        text-align: center;
+        padding: 20px;
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease-in-out;
+        padding: 10px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 10px rgba(106, 17, 203, 0.5);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s ease-in-out;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2575fc, #6a11cb);
+        transform: scale(1.05);
+        /* Hiệu ứng phóng to nhẹ */
+        box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
 </head>
+
 <body>
-    <h1>Thêm Công việc mới</h1>
-    <form action="" method="POST">
-        <label for="title">Tiêu đề:</label>
-        <input type="text" id="title" name="title" required><br>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Thêm công việc mới
+            </div>
+            <div class="card-body">
+                <form action="" method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Tiêu đề :</label>
+                        <input type="text" name="title" id="title" required class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả công việc :</label>
+                        <input type="text" name="description" id="description" required class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">Hạn chót :</label>
+                        <input type="date" name="due_date" id="due_date" required class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Ưu tiên:</label>
+                        <select id="priority" name="priority" required class="form-select">
+                            <option value="High">Cao</option>
+                            <option value="Medium">Trung bình</option>
+                            <option value="Low">Thấp</option>
+                        </select>
+                    </div>
+                    <button type="submit" name="submitContact" class="btn btn-primary w-100">Lưu công việc</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        <label for="description">Mô tả:</label>
-        <textarea id="description" name="description" required></textarea><br>
-
-        <label for="due_date">Hạn chót:</label>
-        <input type="date" id="due_date" name="due_date" required><br>
-
-        <label for="priority">Ưu tiên:</label>
-        <select id="priority" name="priority" required>
-            <option value="High">Cao</option>
-            <option value="Medium">Trung bình</option>
-            <option value="Low">Thấp</option>
-        </select><br>
-
-        <button type="submit">Lưu Công việc</button>
-    </form>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    var messageText = "<?php echo $messageText; ?>"; // Lấy thông báo từ PHP
+    if (messageText !== '') {
+        Swal.fire({
+            title: messageText.includes("lỗi") ? "Error" : "Thành Công",
+            text: messageText,
+            icon: messageText.includes("lỗi") ? "error" : "success",
+        }).then((result) => {
+            if (result.isConfirmed && !messageText.includes("lỗi")) {
+                window.location.href = "index.php"; // Chuyển hướng về trang chủ nếu thành công
+            }
+        });
+    }
+    </script>
 </body>
+
 </html>
