@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_task'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sửa Công việc</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sua_style.css">
 </head>
 <body>
     <h1>Sửa Công việc</h1>
