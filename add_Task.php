@@ -4,27 +4,41 @@ require 'config.php';
 $messageText = ''; // Biến để lưu thông báo
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
-    $title = $conn->real_escape_string($_POST['title']);
-    $description = $conn->real_escape_string($_POST['description']);
-    $due_date = $conn->real_escape_string($_POST['due_date']);
-    $priority = $conn->real_escape_string($_POST['priority']);
+    // Lấy dữ liệu từ form
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $due_date = $_POST['due_date'];
+    $priority = $_POST['priority'];
 
-    $sql = "INSERT INTO tasks (title, description, due_date, priority) 
-            VALUES ('$title', '$description', '$due_date', '$priority')";
-
-    if ($conn->query($sql) === TRUE) {
-        $messageText = "Bạn đã thêm công việc thành công !"; // Gửi thông báo thành công
-    } else {
-        $messageText = "Có lỗi xảy ra: " . $conn->error; // Gửi thông báo lỗi
+    // Câu lệnh SQL để thêm công việc vào cơ sở dữ liệu
+    try {
+        $sql = "INSERT INTO tasks (title, description, due_date, priority) 
+                VALUES (:title, :description, :due_date, :priority)";
+        $stmt = $pdo->prepare($sql);
+        
+        // Gán giá trị cho các tham số
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':due_date', $due_date);
+        $stmt->bindParam(':priority', $priority);
+        
+        // Thực thi câu lệnh SQL
+        if ($stmt->execute()) {
+            $messageText = "Bạn đã thêm công việc thành công !"; // Gửi thông báo thành công
+        } else {
+            $messageText = "Có lỗi xảy ra khi thêm công việc."; // Gửi thông báo lỗi
+        }
+    } catch (PDOException $e) {
+        $messageText = "Lỗi: " . $e->getMessage(); // Xử lý lỗi PDO
     }
 }
 ?>
 <?php
 session_start();
 ?>
+
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
